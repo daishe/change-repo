@@ -1,0 +1,111 @@
+name: "Build & test"
+
+on:
+  push:
+    branches:
+    - main
+    - master
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  go_version: "^1.19"
+
+jobs:
+  test:
+    name: "Test [${{ matrix.os }}]"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - ubuntu-latest
+        - windows-latest
+        - macOS-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - name: "Checkout"
+      uses: actions/checkout@v3
+
+    - name: "Setup Go"
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ env.go_version }}
+        cache: true
+
+    - name: "Lint Go code"
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+
+    - name: "Test project"
+      run: go test -timeout 5m ./...
+
+  build:
+    name: "Build [${{ matrix.GOOS }}/${{ matrix.GOARCH }}]"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        GOOS:
+        - linux
+        - windows
+        - darwin
+        GOARCH:
+        - amd64
+        - arm64
+        APP:
+        - change-repo
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: "Checkout"
+      uses: actions/checkout@v3
+
+    - name: "Setup Go"
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ env.go_version }}
+        cache: true
+
+    - name: "Extract version"
+      id: get_version
+      uses: battila7/get-version-action@v2
+
+    - name: "Generate version information"
+      run: |
+        GIT_TAG="0.0.0-dev+$(date '+%Y%m%d%H%M%S')"
+        if [[ "${{ steps.get_version.outputs.is-semver }}" == "true" ]]; then
+          GIT_TAG="${{ steps.get_version.outputs.version-without-v }}"
+        fi
+        GIT_COMMIT=$(git rev-parse HEAD)
+
+        echo "GIT_TAG=$GIT_TAG"
+        echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
+        echo "GIT_COMMIT=$GIT_COMMIT"
+        echo "GIT_COMMIT=$GIT_COMMIT" >> $GITHUB_ENV
+
+    - name: "Build project [${{ matrix.GOOS }}/${{ matrix.GOARCH }}]"
+      run: |
+        mkdir -p dist
+        GOOS=${{ matrix.GOOS }} GOARCH=${{ matrix.GOARCH }} go build \
+          -ldflags="-X 'main.Version=$GIT_TAG' -X 'main.Commit=$GIT_COMMIT'" \
+          -o dist/${{ matrix.APP }}-${{ matrix.GOOS }}-${{ matrix.GOARCH }} \
+          -v \
+          .
+
+    - name: Archive binaries
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.APP }}-${{ matrix.GOOS }}-${{ matrix.GOARCH }}
+        path: dist
+        retention-days: 5

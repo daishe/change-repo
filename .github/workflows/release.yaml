@@ -1,0 +1,42 @@
+name: "Release"
+
+on:
+  push:
+    tags: # run when release has been tagged, however ignore non-official semver tags (release candidates, etc)
+    - "v[0-9]+.[0-9]+.[0-9]+"
+    - "!v[0-9]+.[0-9]+.[0-9]+-*"
+
+env:
+  go_version: "^1.19"
+
+jobs:
+  build-test:
+    name: "Build & test"
+
+    uses: ./.github/workflows/build-test.yaml
+
+  release:
+    name: "Release"
+
+    needs: build-test
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+
+    - name: "Checkout"
+      uses: actions/checkout@v3
+
+    - name: Download binaries
+      uses: actions/download-artifact@v3
+      with:
+        path: dist
+
+    - name: "Release"
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        files: |
+          LICENSE
+          dist/*/*
