@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/chzyer/readline"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/manifoldco/promptui"
 )
 
@@ -40,7 +41,7 @@ func SelectPrompt(msg string, list []string) (int, error) {
 		HideHelp:          true,
 		StartInSearchMode: true,
 		Searcher: func(input string, i int) bool {
-			return strings.Contains(list[i], input)
+			return fuzzy.Match(input, list[i])
 		},
 		Keys: &promptui.SelectKeys{
 			Prev:     promptui.Key{Code: readline.CharPrev, Display: "↑"},
