@@ -1,7 +1,7 @@
 # Change repo
 
 [![Latest version](https://img.shields.io/github/v/tag/daishe/change-repo?label=latest%20version&sort=semver)](https://github.com/daishe/change-repo/releases)
-[![Latest release status](https://img.shields.io/github/workflow/status/daishe/change-repo/Release?label=release%20build&logo=github&logoColor=fff)](https://github.com/daishe/change-repo/actions/workflows/release.yaml)
+[![Latest release status](https://img.shields.io/github/actions/workflow/status/daishe/change-repo/release.yaml?label=release%20build&logo=github&logoColor=fff)](https://github.com/daishe/change-repo/actions/workflows/release.yaml)
 
 [![Go version](https://img.shields.io/github/go-mod/go-version/daishe/change-repo?label=version&logo=go&logoColor=fff)](https://golang.org/dl/)
 [![License](https://img.shields.io/github/license/daishe/change-repo)](https://github.com/daishe/change-repo/blob/master/LICENSE)
