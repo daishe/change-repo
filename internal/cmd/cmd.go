@@ -59,10 +59,8 @@ func baseDirs(args []string) (res []string) {
 		parts := strings.Split(os.Getenv(envName), string(os.PathListSeparator))
 		res := make([]string, 0, len(parts))
 		for _, p := range parts {
-			for _, x := range strings.Split(p, ":") { // forced Unix path list separator
-				if x = filepath.Clean(x); x != "" {
-					res = append(res, x)
-				}
+			if p = filepath.Clean(p); p != "" {
+				res = append(res, p)
 			}
 		}
 		return res
