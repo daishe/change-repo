@@ -2,6 +2,8 @@ module github.com/daishe/change-repo
 
 go 1.24.0
 
+toolchain go1.24.4
+
 require (
 	github.com/chzyer/readline v1.5.1
 	github.com/google/go-cmp v0.5.8
