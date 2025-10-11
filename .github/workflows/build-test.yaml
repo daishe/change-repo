@@ -37,26 +37,6 @@ jobs:
         go-version-file: go.mod
         cache-dependency-path: "**/*.sum"
 
-    - name: "Check if `go mod tidy` has been run properly"
-      run: |
-        go mod tidy
-        if ! (git update-index --refresh > /dev/null && git diff-index --quiet HEAD --); then
-          echo 'ERROR: go.mod file is outdated.' >&2
-          echo 'Please update go.mod file by running' >&2
-          echo '    go mod tidy' >&2
-          echo 'in the root of the repository before committing changes.' >&2
-        fi
-
-    - name: "Check if `go mod tidy` has been run properly for tools"
-      run: |
-        (cd tools && go mod tidy)
-        if ! (git update-index --refresh > /dev/null && git diff-index --quiet HEAD --); then
-          echo 'ERROR: Tools go.mod file is outdated.' >&2
-          echo 'Please update tools/go.mod file by running' >&2
-          echo '    (cd tools && go mod tidy)' >&2
-          echo 'in the root of the repository before committing changes.' >&2
-        fi
-
     - name: "Test project"
       run: make test
 
@@ -92,6 +72,42 @@ jobs:
 
     - name: "Lint Go code (makefile)"
       run: make lint
+
+  check_repository_state:
+    name: "Check repository state"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+
+    - name: "Checkout"
+      uses: actions/checkout@v5
+
+    - name: "Setup Go"
+      uses: actions/setup-go@v6
+      with:
+        go-version-file: go.mod
+        cache-dependency-path: "**/*.sum"
+
+    - name: "Check if `go mod tidy` has been run properly"
+      run: |
+        go mod tidy
+        if ! (git update-index --refresh > /dev/null && git diff-index --quiet HEAD --); then
+          echo 'ERROR: go.mod file is outdated.' >&2
+          echo 'Please update go.mod file by running' >&2
+          echo '    go mod tidy' >&2
+          echo 'in the root of the repository before committing changes.' >&2
+        fi
+
+    - name: "Check if `go mod tidy` has been run properly for tools"
+      run: |
+        (cd tools && go mod tidy)
+        if ! (git update-index --refresh > /dev/null && git diff-index --quiet HEAD --); then
+          echo 'ERROR: Tools go.mod file is outdated.' >&2
+          echo 'Please update tools/go.mod file by running' >&2
+          echo '    (cd tools && go mod tidy)' >&2
+          echo 'in the root of the repository before committing changes.' >&2
+        fi
 
   build:
     name: "Build [${{ matrix.GOOS }}/${{ matrix.GOARCH }}]"
