@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package cmd
+package cmd //nolint:testpackage // this package needs access to some private global values
 
 import (
 	"bytes"
@@ -40,7 +40,7 @@ func p(path string) string {
 	return strings.ReplaceAll(path, "/", string(os.PathSeparator))
 }
 
-func TestScanForReposProcedure(t *testing.T) {
+func TestScanForReposProcedure(t *testing.T) { //nolint:paralleltest // this test overrides some global values and should not be run in parallel
 	tests := []struct {
 		name     string
 		path     string
@@ -57,7 +57,7 @@ func TestScanForReposProcedure(t *testing.T) {
 		},
 	}
 
-	for _, td := range tests {
+	for _, td := range tests { //nolint:paralleltest // this test overrides some global values and should not be run in parallel
 		t.Run(td.name, func(t *testing.T) {
 			originalGitDirectory := gitDirectory
 			gitDirectory = "git-data"

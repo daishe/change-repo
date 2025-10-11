@@ -1,0 +1,126 @@
+version: "2"
+linters:
+  # https://golangci-lint.run/usage/linters/#enabled-by-default
+  enable:
+  - errcheck
+  - govet
+  - ineffassign
+  - staticcheck
+  - unused
+  - asasalint
+  - asciicheck
+  - bidichk
+  - bodyclose
+  - canonicalheader
+  - contextcheck
+  - copyloopvar
+  - decorder
+  - dogsled
+  - dupl
+  - dupword
+  - durationcheck
+  - errchkjson
+  - errname
+  - errorlint
+  - exhaustive
+  - exptostd
+  - fatcontext
+  - forcetypeassert
+  - funcorder
+  - funlen
+  - gocheckcompilerdirectives
+  - gochecknoinits
+  - gochecksumtype
+  - gocognit
+  - goconst
+  - gocritic
+  - gocyclo
+  - godot
+  - godox
+  - gomoddirectives
+  - goprintffuncname
+  - gosec
+  - gosmopolitan
+  - iface
+  - importas
+  - inamedparam
+  - interfacebloat
+  - intrange
+  - loggercheck
+  - maintidx
+  - makezero
+  - mirror
+  - misspell
+  - musttag
+  - nakedret
+  - nilerr
+  - nilnesserr
+  - nilnil
+  - noctx
+  - nolintlint
+  - nosprintfhostport
+  - paralleltest
+  - perfsprint
+  - prealloc
+  - predeclared
+  - protogetter
+  - reassign
+  - recvcheck
+  - rowserrcheck
+  - spancheck
+  - sqlclosecheck
+  - tagalign
+  - tagliatelle
+  - testableexamples
+  - testifylint
+  - testpackage
+  - thelper
+  - tparallel
+  - unconvert
+  - unparam
+  - usestdlibvars
+  - usetesting
+  - wastedassign
+  - whitespace
+
+  # https://golangci-lint.run/usage/linters/#disabled-by-default
+  disable:
+  - cyclop
+  - err113 # dynamic errors are ok for CLI tool
+  - gochecknoglobals
+  - ireturn
+  - lll
+  - mnd # complains too much about file mode numbers
+  - nestif
+  - revive
+  - varnamelen
+  - wsl
+
+  settings:
+    gocritic:
+      enable-all: true
+      disabled-checks:
+      - emptyStringTest
+      - unnamedResult
+
+  exclusions:
+    generated: strict
+    warn-unused: true
+    presets:
+    - comments
+    - common-false-positives
+    - legacy
+    - std-error-handling
+    # rules:
+    #   - path: '^cmd/.*\.go$'
+    #     linters:
+    #     - contextcheck
+    #     - unparam
+
+formatters:
+  enable:
+  - gofmt
+  exclusions:
+    warn-unused: true
+    generated: strict
+    paths: []

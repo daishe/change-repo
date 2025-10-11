@@ -17,6 +17,7 @@ package ui
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -68,14 +69,14 @@ func selectPrompt_windows(msg string, list []string) (int, error) {
 	line, err := reader.ReadString('\n')
 	fmt.Print("\n")
 	if err != nil {
-		if err == io.EOF {
-			err = fmt.Errorf("invalid selection")
+		if errors.Is(err, io.EOF) {
+			err = errors.New("invalid selection")
 		}
 		return -1, err
 	}
 	idx, err := strconv.Atoi(strings.TrimSpace(line))
 	if err != nil || idx < 1 || idx > len(list) {
-		return -1, fmt.Errorf("invalid selection")
+		return -1, errors.New("invalid selection")
 	}
 	return idx - 1, nil
 }

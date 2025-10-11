@@ -92,7 +92,7 @@ func pickBaseDir(c *cobra.Command, baseDirs []string) string {
 	return baseDir
 }
 
-func scanForRepos(c *cobra.Command, root string, maxdepth uint, repos *[]string, nonRepos *[]string) {
+func scanForRepos(c *cobra.Command, root string, maxdepth uint, repos, nonRepos *[]string) {
 	if maxdepth == 0 {
 		return
 	}
@@ -138,7 +138,7 @@ func isGitRepo(path string) (bool, error) {
 	return s.IsDir(), nil
 }
 
-func pickRepoDir(c *cobra.Command, root string, repos []string, nonRepos []string) string {
+func pickRepoDir(c *cobra.Command, root string, repos, nonRepos []string) string {
 	repos = stringsSortedUnique(pathsFromRoot(repos, root))
 	nonRepos = stringsSortedUnique(pathsFromRoot(nonRepos, root))
 
@@ -215,7 +215,7 @@ func shellExecutable() string {
 	return "sh"
 }
 
-func run(c *cobra.Command, dir string, name string, args ...string) {
+func run(c *cobra.Command, dir, name string, args ...string) {
 	cmd := exec.CommandContext(c.Context(), name, args...)
 	cmd.Dir = dir
 	cmd.Stderr = c.ErrOrStderr()
