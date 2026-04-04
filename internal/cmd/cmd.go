@@ -1,4 +1,4 @@
-// Copyright 2022 Marek Dalewski
+// Copyright 2022-2026 Marek Dalewski
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -103,11 +103,11 @@ func scanForRepos(c *cobra.Command, root string, maxdepth uint, repos, nonRepos 
 	status.ShowErr(c.Context(), err)
 
 	for _, e := range entries {
-		if !e.IsDir() {
+		innerDir := enterDirEntryIfDir(c, root, e)
+		if innerDir == "" {
 			continue
 		}
 
-		innerDir := filepath.Join(root, e.Name())
 		isGitRepo, err := isGitRepo(innerDir)
 		status.ShowErr(c.Context(), err)
 
@@ -123,6 +123,31 @@ func scanForRepos(c *cobra.Command, root string, maxdepth uint, repos, nonRepos 
 	if someRepoFound {
 		*nonRepos = append(*nonRepos, nonReposCache...)
 	}
+}
+
+func enterDirEntryIfDir(c *cobra.Command, root string, entry os.DirEntry) string {
+	path := filepath.Join(root, entry.Name())
+	if entry.IsDir() {
+		return path
+	}
+
+	if entry.Type()&os.ModeSymlink == 0 {
+		return ""
+	}
+	target, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		status.ShowErr(c.Context(), err)
+		return ""
+	}
+	stat, err := os.Stat(target)
+	if err != nil {
+		status.ShowErr(c.Context(), err)
+		return ""
+	}
+	if !stat.IsDir() {
+		return ""
+	}
+	return path
 }
 
 var gitDirectory string = ".git"
