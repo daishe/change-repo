@@ -1,4 +1,4 @@
-// Copyright 2022 Marek Dalewski
+// Copyright 2022-2026 Marek Dalewski
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ func SelectPrompt(msg string, list []string) (int, error) {
 			PageDown: promptui.Key{Code: readline.CharForward, Display: "→"},
 			Search:   promptui.Key{Code: readline.CharCtrlW, Display: "^W"},
 		},
+		Stdout: os.Stderr,
 	}
 
 	idx, _, err := component.Run()
@@ -62,9 +63,9 @@ func SelectPrompt(msg string, list []string) (int, error) {
 
 func selectPrompt_windows(msg string, list []string) (int, error) {
 	for i, li := range list {
-		fmt.Printf("  %d: %s\n", i+1, li)
+		fmt.Fprintf(os.Stderr, "  %d: %s\n", i+1, li)
 	}
-	fmt.Printf("%s: ", msg)
+	fmt.Fprintf(os.Stderr, "%s: ", msg)
 	reader := bufio.NewReader(os.Stdin)
 	line, err := reader.ReadString('\n')
 	fmt.Print("\n")

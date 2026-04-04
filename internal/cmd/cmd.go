@@ -84,7 +84,7 @@ func pickBaseDir(c *cobra.Command, baseDirs []string) string {
 		baseIdx, err := ui.SelectPrompt("Select set of repositories", baseDirs)
 		status.CheckErr(c.Context(), err)
 		baseDir = baseDirs[baseIdx]
-		fmt.Fprintf(c.OutOrStdout(), "> %s\n", baseDir)
+		fmt.Fprintf(c.ErrOrStderr(), "> %s\n", baseDir)
 	}
 
 	baseDir, err := filepath.Abs(baseDir)
@@ -174,14 +174,14 @@ func pickRepoDir(c *cobra.Command, root string, repos, nonRepos []string) string
 	pickNonRepo := func() string {
 		nonRepoIdx, err := ui.SelectPrompt("Select location", nonRepos)
 		status.CheckErr(c.Context(), err)
-		fmt.Fprintf(c.OutOrStdout(), "> %s\n", nonRepos[nonRepoIdx])
+		fmt.Fprintf(c.ErrOrStderr(), "> %s\n", nonRepos[nonRepoIdx])
 		return filepath.Join(root, nonRepos[nonRepoIdx])
 	}
 
 	pickRepo := func() string {
 		repoIdx, err := ui.SelectPrompt("Select repository", repos)
 		status.CheckErr(c.Context(), err)
-		fmt.Fprintf(c.OutOrStdout(), "> %s\n", repos[repoIdx])
+		fmt.Fprintf(c.ErrOrStderr(), "> %s\n", repos[repoIdx])
 
 		if len(nonRepos) > 0 && repoIdx == len(repos)-1 { // non repo request
 			return pickNonRepo()
@@ -194,7 +194,7 @@ func pickRepoDir(c *cobra.Command, root string, repos, nonRepos []string) string
 		if len(nonRepos) == 0 {
 			status.CheckErr(c.Context(), "no Git repositories found")
 		}
-		fmt.Fprintf(c.OutOrStdout(), "No Git repositories found\n")
+		fmt.Fprintf(c.ErrOrStderr(), "No Git repositories found\n")
 		return pickNonRepo()
 	}
 	return pickRepo()

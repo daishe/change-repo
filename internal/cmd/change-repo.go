@@ -1,4 +1,4 @@
-// Copyright 2022 Marek Dalewski
+// Copyright 2022-2026 Marek Dalewski
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"github.com/daishe/change-repo/internal/status"
@@ -29,21 +31,30 @@ func NewChangeRepoCmd(info *AppInfo) *cobra.Command {
 	}
 
 	maxdepthFlag := c.Flags().Uint("maxdepth", 20, "controls recursion depth when scanning for Git repositories")
+	showFlag := c.Flags().Bool("show", false, "controls wether to only show the path to the selected for Git repositories or navigation to it in a sub-shell")
+	ignoreSoftErrorsFlag := c.Flags().Bool("ignore-soft-errors", false, "soft errors will not cause non zero exit code")
 	versionFlag := c.Flags().Bool("version", false, "display version and copyright information")
 
-	c.RunE = func(c *cobra.Command, args []string) error {
+	c.Run = func(c *cobra.Command, args []string) {
 		if *versionFlag {
 			displayVersion(c, info)
 			status.Exit(c.Context(), 0)
 		}
 
 		baseDir := pickBaseDir(c, baseDirs(args))
-		respos, nonRespos := []string(nil), []string(nil)
-		scanForRepos(c, baseDir, *maxdepthFlag, &respos, &nonRespos)
-		repoDir := pickRepoDir(c, baseDir, respos, nonRespos)
-		changeDir(c, repoDir)
+		repos, nonRepos := []string(nil), []string(nil)
+		scanForRepos(c, baseDir, *maxdepthFlag, &repos, &nonRepos)
+		repoDir := pickRepoDir(c, baseDir, repos, nonRepos)
 
-		return nil
+		if *ignoreSoftErrorsFlag {
+			status.ClearErr(c.Context())
+		}
+
+		if *showFlag {
+			fmt.Fprintf(c.OutOrStdout(), "%s\n", repoDir)
+			return
+		}
+		changeDir(c, repoDir)
 	}
 
 	return c

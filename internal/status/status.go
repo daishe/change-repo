@@ -1,4 +1,4 @@
-// Copyright 2022 Marek Dalewski
+// Copyright 2022-2026 Marek Dalewski
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -70,6 +70,10 @@ func unpack(ctx context.Context) *statusStore {
 		return nil
 	}
 	return s
+}
+
+func ClearErr(ctx context.Context) {
+	Track(ctx, func(s Status) Status { s.ErrorOccurred = false; return s })
 }
 
 func ShowErr(ctx context.Context, msg interface{}) {

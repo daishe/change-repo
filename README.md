@@ -19,7 +19,7 @@ change-repo .
 When you pick from the list it will open a new shell in the selected location. You can also configure a set of standard locations using `CHANGE_REPO_PATH` environment variable:
 
 ```sh
-export CHANGE_REPO_PATH="/path/to/location/1:/path/to/other/location"
+export CHANGE_REPO_PATH="/path/to/location:/path/to/other/location"
 ```
 
 and then invoke application without any arguments:
@@ -40,10 +40,16 @@ To get the complete list of all flags, use
 change-repo --help
 ```
 
-Most likely you will also be interested in creating alias
+Most likely you will also be interested in creating an alias
 
 ```sh
 alias cr="change-repo"
+```
+
+Or an other alias that do not creates any sub-shells
+
+```sh
+alias cr='cd "$(change-repo --ignore-soft-errors --show || echo .)"'
 ```
 
 ## Options
