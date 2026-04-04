@@ -93,7 +93,7 @@ jobs:
       run: |
         make tidy
         if ! (git update-index --refresh > /dev/null && git diff-index --quiet HEAD --); then
-          echo 'ERROR: One or more go.mod or go.sum files are outdated. >&2
+          echo 'ERROR: One or more go.mod or go.sum files are outdated.' >&2
           echo 'Please update go.mod and go.sum files by running' >&2
           echo '    make tidy' >&2
           echo 'before committing changes.' >&2
