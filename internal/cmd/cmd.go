@@ -44,7 +44,7 @@ type AppInfo struct {
 func displayVersion(c *cobra.Command, info *AppInfo) {
 	fmt.Fprintf(c.OutOrStdout(), "Version of application: %s, commit: %s\n", info.AppVersion, info.CommitHash)
 	fmt.Fprintf(c.OutOrStdout(), "\n")
-	fmt.Fprintf(c.OutOrStdout(), "Copyright 2022 Marek Dalewski. License GPLv3+: GNU General Public License version 3 or later\n")
+	fmt.Fprintf(c.OutOrStdout(), "Copyright 2022-2026 Marek Dalewski. License GPLv3+: GNU General Public License version 3 or later\n")
 	fmt.Fprintf(c.OutOrStdout(), "\n")
 	fmt.Fprintf(c.OutOrStdout(), "You should have received a copy of the GNU General Public License along with this program. If not, see <https://gnu.org/licenses/gpl.html>.\n")
 	fmt.Fprintf(c.OutOrStdout(), "This is free software: you are free to change and redistribute it. This program comes with ABSOLUTELY NO WARRANTY.\n")
