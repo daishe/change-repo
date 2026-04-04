@@ -10,11 +10,23 @@ GOOS=$(1) GOARCH=$(2) go build -ldflags="-X 'main.Version=$(GIT_TAG)' -X 'main.C
 endef
 
 .PHONY: all
-all: lint test dist-all
+all: lint test dist
 
 .PHONY: clean
 clean: dist-clean tools-clean
 	rm -rf dependencies
+
+.PHONY: tidy
+tidy:
+	go mod tidy
+	cd tools && go mod tidy
+
+.PHONY: update
+update:
+	go get -t -u all
+	go mod tidy
+	cd tools && go list -f '{{if and (not .Indirect) (not .Main)}}{{.Path}}{{end}}' -m all | xargs go get --tags tools -t -u
+	cd tools && go mod tidy
 
 dependencies: go.mod go.sum
 	go mod download
@@ -32,8 +44,8 @@ test: dependencies
 .PHONY: build
 build: dist/change-repo
 
-.PHONY: dist-all
-dist-all: build dist/change-repo-linux-amd64 dist/change-repo-linux-arm64 dist/change-repo-windows-amd64.exe dist/change-repo-windows-arm64.exe dist/change-repo-darwin-amd64 dist/change-repo-darwin-arm64
+.PHONY: dist
+dist: build dist/change-repo-linux-amd64 dist/change-repo-linux-arm64 dist/change-repo-windows-amd64.exe dist/change-repo-windows-arm64.exe dist/change-repo-darwin-amd64 dist/change-repo-darwin-arm64
 
 .PHONY: dist-clean
 dist-clean:
@@ -66,8 +78,8 @@ dist/change-repo-windows-amd64: dist/change-repo-windows-amd64.exe
 .PHONY: dist/change-repo-windows-arm64
 dist/change-repo-windows-arm64: dist/change-repo-windows-arm64.exe
 
-.PHONY: tools-all
-tools-all: bin/golangci-lint
+.PHONY: tools
+tools: bin/golangci-lint
 
 .PHONY: tools-clean
 tools-clean:
