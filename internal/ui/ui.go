@@ -56,6 +56,12 @@ func SelectPrompt(msg string, list []string) (int, error) {
 
 	idx, _, err := component.Run()
 	if err != nil {
+		if errors.Is(err, promptui.ErrInterrupt) {
+			os.Exit(2)
+		}
+		if errors.Is(err, promptui.ErrEOF) {
+			err = io.ErrUnexpectedEOF
+		}
 		return 0, err
 	}
 	return idx, nil
