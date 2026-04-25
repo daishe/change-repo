@@ -20,6 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/daishe/change-repo/internal/find"
 	"github.com/daishe/change-repo/internal/status"
 )
 
@@ -30,7 +31,7 @@ func NewChangeRepoCmd(info *AppInfo) *cobra.Command {
 		Long:  "change-repo - a simple CLI utility to change the current working directory to\none containing Git repository.",
 	}
 
-	maxdepthFlag := c.Flags().Uint("maxdepth", 20, "controls recursion depth when scanning for Git repositories")
+	maxdepthFlag := c.Flags().Uint("maxdepth", find.DefaultMaxDepth, "controls recursion depth when scanning for Git repositories")
 	showFlag := c.Flags().Bool("show", false, "controls wether to only show the path to the selected for Git repositories or navigation to it in a sub-shell")
 	ignoreSoftErrorsFlag := c.Flags().Bool("ignore-soft-errors", false, "soft errors will not cause non zero exit code")
 	versionFlag := c.Flags().Bool("version", false, "display version and copyright information")
@@ -42,8 +43,7 @@ func NewChangeRepoCmd(info *AppInfo) *cobra.Command {
 		}
 
 		baseDir := pickBaseDir(c, baseDirs(args))
-		repos, nonRepos := []string(nil), []string(nil)
-		scanForRepos(c, baseDir, *maxdepthFlag, &repos, &nonRepos)
+		repos, nonRepos := scanForRepos(c, baseDir, *maxdepthFlag)
 		repoDir := pickRepoDir(c, baseDir, repos, nonRepos)
 
 		if *ignoreSoftErrorsFlag {

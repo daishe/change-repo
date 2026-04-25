@@ -18,6 +18,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -26,6 +27,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/daishe/change-repo/internal/detect"
+	"github.com/daishe/change-repo/internal/find"
 	"github.com/daishe/change-repo/internal/status"
 	"github.com/daishe/change-repo/internal/ui"
 )
@@ -92,37 +95,26 @@ func pickBaseDir(c *cobra.Command, baseDirs []string) string {
 	return baseDir
 }
 
-func scanForRepos(c *cobra.Command, root string, maxdepth uint, repos, nonRepos *[]string) {
-	if maxdepth == 0 {
-		return
+func scanForRepos(c *cobra.Command, root string, maxdepth uint) ([]string, []string) {
+	search := find.Find{
+		Root:     root,
+		Maxdepth: maxdepth,
+		OnError: func(err error) bool {
+			status.ShowErr(c.Context(), err)
+			return true
+		},
+		Cond: func(path string, _ fs.FileMode) (bool, error) {
+			verdict, err := detect.IsRepo(path, detect.NormalRepo|detect.BareRepo|detect.WorkTreeDir)
+			if err != nil {
+				return false, err
+			}
+			if verdict == detect.NonRepo {
+				return false, nil
+			}
+			return true, find.NoDescend
+		},
 	}
-
-	someRepoFound, nonReposCache := false, []string(nil)
-
-	entries, err := os.ReadDir(root)
-	status.ShowErr(c.Context(), err)
-
-	for _, e := range entries {
-		innerDir := enterDirEntryIfDir(c, root, e)
-		if innerDir == "" {
-			continue
-		}
-
-		isGitRepo, err := isGitRepo(innerDir)
-		status.ShowErr(c.Context(), err)
-
-		if isGitRepo {
-			someRepoFound = true
-			*repos = append(*repos, innerDir)
-		} else {
-			nonReposCache = append(nonReposCache, innerDir)
-			scanForRepos(c, innerDir, maxdepth-1, repos, nonRepos)
-		}
-	}
-
-	if someRepoFound {
-		*nonRepos = append(*nonRepos, nonReposCache...)
-	}
+	return search.AllDirs()
 }
 
 func enterDirEntryIfDir(c *cobra.Command, root string, entry os.DirEntry) string {
