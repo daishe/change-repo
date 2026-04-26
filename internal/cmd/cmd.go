@@ -117,44 +117,6 @@ func scanForRepos(c *cobra.Command, root string, maxdepth uint) ([]string, []str
 	return search.AllDirs()
 }
 
-func enterDirEntryIfDir(c *cobra.Command, root string, entry os.DirEntry) string {
-	path := filepath.Join(root, entry.Name())
-	if entry.IsDir() {
-		return path
-	}
-
-	if entry.Type()&os.ModeSymlink == 0 {
-		return ""
-	}
-	target, err := filepath.EvalSymlinks(path)
-	if err != nil {
-		status.ShowErr(c.Context(), err)
-		return ""
-	}
-	stat, err := os.Stat(target)
-	if err != nil {
-		status.ShowErr(c.Context(), err)
-		return ""
-	}
-	if !stat.IsDir() {
-		return ""
-	}
-	return path
-}
-
-var gitDirectory string = ".git"
-
-func isGitRepo(path string) (bool, error) {
-	s, err := os.Stat(filepath.Join(path, gitDirectory))
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		}
-		return false, fmt.Errorf("could not determine if path contains a Git repository: %w", err)
-	}
-	return s.IsDir(), nil
-}
-
 func pickRepoDir(c *cobra.Command, root string, repos, nonRepos []string) string {
 	repos = stringsSortedUnique(pathsFromRoot(repos, root))
 	nonRepos = stringsSortedUnique(pathsFromRoot(nonRepos, root))

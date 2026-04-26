@@ -36,6 +36,8 @@ func p(path string) string {
 }
 
 func TestFindDirs(t *testing.T) {
+	t.Parallel()
+
 	search := find.Find{
 		Root:     "testdata",
 		Maxdepth: 2,

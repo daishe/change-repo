@@ -28,6 +28,7 @@ var TestdataLocs = []Loc{
 }
 
 func OverrideTestdataNames(t *testing.T) {
+	t.Helper()
 	detect.OverrideGitDirectory(t, "git-data")
 	detect.OverrideGitFile(t, "git-file")
 	detect.OverrideHeadFile(t, "head-file")

@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	NoDescend = errors.New("no descend")
+	NoDescend = errors.New("no descend") //nolint:errname,staticcheck // The name do not start with 'Err' intentionally.
 )
 
 const DefaultMaxDepth uint = 20
@@ -20,7 +20,7 @@ type Find struct {
 	Cond     func(string, fs.FileMode) (bool, error)
 }
 
-func (s *Find) onError(err error) bool {
+func (s Find) onError(err error) bool {
 	if err == nil {
 		return true
 	}
@@ -33,7 +33,7 @@ func (s *Find) onError(err error) bool {
 	return false
 }
 
-func (s *Find) cond(path string, mode fs.FileMode) (bool, error) {
+func (s Find) cond(path string, mode fs.FileMode) (bool, error) {
 	if s.Cond == nil {
 		return true, nil
 	}
@@ -72,7 +72,7 @@ func (s Find) allDirs(match, nonMatch *[]string) bool {
 		}
 
 		ok, err := s.cond(path, e.Type())
-		if err != nil && err != NoDescend {
+		if err != nil && err != NoDescend { //nolint:errorlint // Direct comparison with NoDescend is required, as it should not be wrapped.
 			if !s.onError(err) {
 				return false
 			}
@@ -85,7 +85,7 @@ func (s Find) allDirs(match, nonMatch *[]string) bool {
 			nonMatchCache = append(nonMatchCache, path)
 		}
 
-		if err == NoDescend {
+		if err == NoDescend { //nolint:errorlint // Direct comparison with NoDescend is required, as it should not be wrapped.
 			continue
 		}
 		next := s
