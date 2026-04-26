@@ -39,7 +39,7 @@ lint: bin/golangci-lint
 
 .PHONY: test
 test: dependencies
-	go test -timeout 5m ./...
+	go test -count 1 -timeout 5m ./...
 
 .PHONY: build
 build: dist/change-repo
